@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">    
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn1 {
+            background-color: #df1212;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            margin-right: 70px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .btn2 {
+            background-color: #12df42;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            margin-right: 70px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .data-container {
+            padding: 10px;
+            background: black;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 10px 0;
+        }
+
+        .data-item {
+            margin-bottom: 10px;
+            transition: transform 0.2s, box-shadow 0.2s; /* Smooth animation */
+        }
+
+        /* Glowing effect on hover */
+        .data-item:hover {
+            transform: scale(1.02); /* Slight zoom effect */
+            box-shadow: 0 0 10px 2px rgba(72, 239, 128, 0.8); /* Glowing green shadow */
+        }
+    </style>
+</head>
+
+<body>
+    <button class="btn" onclick="window.location.href='Add.html'">Add Employee</button>
+    <hr />
+    <div id="p" class="data-container"></div>
+
+    <script>
+        function deletedata(Id) {
+            console.log(Id);
+            let id = Number(Id);
+            fetch('https://localhost:44313/api/Employee/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (response.status == 204) {
+                        alert("Item deleted successfully.");
+                        location.reload();
+                    } else if (response.status == 404) {
+                        alert("Item not found.");
+                    } else {
+                        alert("Failed to delete item. Status: " + response.status);
+                    }
+                })
+                .catch(error => {
+                    alert("An error occurred: " + error);
+                });
+        }
+
+        function getdata() {
+            let id;
+            fetch('https://localhost:44313/api/Employee')
+                .then(response => response.json())
+                .then(data => {
+                    let fd = "";
+                    for (let x of data) {
+                        fd += `<div class="data-item" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 10px; padding: 10px; border: 1px solid #4CAF50; border-radius: 8px; background: #222;">`;
+
+                        // Employee details with styled labels and values
+                        fd += `<div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px;">`;
+                        for (let b in x) {
+                            if (b === 'id') {
+                                id = x[b];
+                            }
+                            fd += `
+                                <div>
+                                    <strong style="color: #4CAF50; text-transform: capitalize;">${b}</strong>: 
+                                    <span style="color: #ddd;" text-transform: capitalize>${x[b]}</span>
+                                </div>`;
+                        }
+                        fd += `</div>`;
+
+                        // Buttons with proper spacing
+                        fd += `<div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+                                <button class="btn2" onclick="window.location.href='Update.html?id=${id}'">Update</button>
+                                <button class="btn1" onclick="deletedata(${id})">Delete</button>
+                            </div>`;
+
+                        fd += `</div><hr style="border-top: 1px solid #555;" />`;
+                    }
+                    document.getElementById('p').innerHTML = fd;
+                });
+        }
+
+        getdata();
+    </script>
+</body>
+
+</html>

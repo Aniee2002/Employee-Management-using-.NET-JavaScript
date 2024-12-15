@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Employee</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+        }
+
+        /* Star animation container */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* Puts stars behind everything */
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 2s infinite alternate, flyby 10s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyby {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+
+            100% {
+                transform: translateY(150vh) translateX(-10vw);
+            }
+        }
+
+        .form-container {
+            max-width: 400px;
+            margin: 100px auto 0;
+            background: rgba(37, 36, 36, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(113, 111, 111, 0.5);
+            z-index: 1;
+            position: relative;
+            /* Ensures it stays above the starry background */
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #daddda;
+            border: 1px solid #cfc2c2;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            /* Green background */
+            border: none;
+            color: white;
+            /* White text */
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="form-container">
+        <h2>Update Employee</h2>
+        <form id="employeeForm">
+            <label for="name">ID:</label>
+            <input type="text" id="0" name="name" placeholder="Enter employee's ID" readonly>
+
+            <label for="name">Name:</label>
+            <input type="text" id="1" name="name" placeholder="Enter employee's name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="2" name="email" placeholder="Enter employee's email" required>
+
+            <label for="department">Department:</label>
+            <input type="text" id="3" name="department" placeholder="Enter department" required>
+
+            <button type="button" class="btn" onclick="updatedata()">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const starContainer = document.getElementById("stars");
+        const starCount = 130;
+
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement("div");
+            star.className = "star";
+            star.style.top = Math.random() * 100 + "vh";
+            star.style.left = Math.random() * 100 + "vw";
+            star.style.animationDelay = Math.random() * 5 + "s";
+            star.style.animationDuration = Math.random() * 10 + 5 + "s";
+
+            starContainer.appendChild(star);
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const ID = urlParams.get('id');
+
+        function getdata() {
+            let i = 0;
+            fetch('https://localhost:44313/api/Employee/' + ID)
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    for (let b in data) {
+                        document.getElementById(i).value = data[b];
+                        i++;
+                    }
+                });
+        }
+
+        getdata();
+        async function updatedata() {
+            const id = document.getElementById('0').value;
+            const name = document.getElementById('1').value;
+            const email = document.getElementById('2').value;
+            const department = document.getElementById('3').value;
+
+            if (!id || !name || !email || !department) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            const user = {
+                id: id,
+                name: name,
+                email: email,
+                department: department
+            };
+
+            const response = await fetch('https://localhost:44313/api/Employee/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(user)
+            });
+
+            if (response.ok) {
+                alert("Employee updated successfully!");
+                window.location.href = "Index.html";
+            } else {
+                alert("Failed to update employee. Status: " + response.status);
+            }
+        }
+    </script>
+</body>
+
+</html>
